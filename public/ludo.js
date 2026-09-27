@@ -4,6 +4,8 @@
     const yugiohSetup = document.getElementById('loginScreen');
     const yugiohGame = document.getElementById('gameScreen');
     const ludoScreen = document.getElementById('ludoScreen');
+    const snakesLaddersScreen = document.getElementById('snakesLaddersScreen');
+    const unoScreen = document.getElementById('unoScreen');
     const setup = document.getElementById('ludoSetup');
     const game = document.getElementById('ludoGame');
     const nameInput = document.getElementById('ludoPlayerName');
@@ -45,10 +47,10 @@
         [[7, 12], [7, 11], [7, 10], [7, 9], [7, 8], [7, 7]]
     ];
     const baseCells = [
-        [[1.8, 1.8], [4.2, 1.8], [1.8, 4.2], [4.2, 4.2]],
-        [[10.8, 1.8], [13.2, 1.8], [10.8, 4.2], [13.2, 4.2]],
-        [[10.8, 10.8], [13.2, 10.8], [10.8, 13.2], [13.2, 13.2]],
-        [[1.8, 10.8], [4.2, 10.8], [1.8, 13.2], [4.2, 13.2]]
+        [[2, 2], [4, 2], [2, 4], [4, 4]],
+        [[11, 2], [13, 2], [11, 4], [13, 4]],
+        [[11, 11], [13, 11], [11, 13], [13, 13]],
+        [[2, 11], [4, 11], [2, 13], [4, 13]]
     ];
     let playerToken = localStorage.getItem(tokenKey);
     let currentRoom = '';
@@ -70,6 +72,8 @@
         gameMenu.style.display = 'none';
         yugiohSetup.style.display = 'none';
         yugiohGame.style.display = 'none';
+        snakesLaddersScreen.style.display = 'none';
+        unoScreen.style.display = 'none';
         ludoScreen.style.display = 'block';
         setup.style.display = 'flex';
     };
@@ -326,11 +330,12 @@
             const color = piece.player.color;
             svg.push(`<g class="ludo-piece${legal ? ' is-legal' : ''}" data-piece-seat="${piece.player.seat}" data-piece-index="${piece.pieceIndex}" tabindex="${legal ? '0' : '-1'}" role="button" aria-label="Move ${color} piece ${piece.pieceIndex + 1}" transform="translate(${piece.x + dx} ${piece.y + dy})">`);
             svg.push('<circle class="ludo-piece-hit-area" r=".4" fill="transparent" pointer-events="all"/>');
-            svg.push(`<ellipse class="ludo-piece-shadow" cx="0" cy=".28" rx=".34" ry=".13"/>`);
+            svg.push('<g class="ludo-piece-art" transform="translate(0 .04)">');
+            svg.push('<ellipse class="ludo-piece-shadow" cx="0" cy=".18" rx=".34" ry=".13"/>');
             svg.push(`<ellipse cx="0" cy=".16" rx=".33" ry=".15" fill="url(#base-${color})" stroke="#fff" stroke-width=".055"/>`);
             svg.push(`<path d="M-.24 .16 C-.23 .02-.14-.06-.12-.17 A.22.22 0 1 1 .12-.17 C.14-.06.23.02.24.16 Q0 .27-.24.16Z" fill="url(#pawn-${color})" stroke="#fff" stroke-width=".055"/>`);
             svg.push(`<circle cx="-.075" cy="-.255" r=".047" fill="#fff" opacity=".55"/>`);
-            svg.push(`<text y=".205" text-anchor="middle" class="ludo-piece-number">${piece.pieceIndex + 1}</text></g>`);
+            svg.push(`<text y=".205" text-anchor="middle" class="ludo-piece-number">${piece.pieceIndex + 1}</text></g></g>`);
         });
         svg.push('</svg>');
         board.innerHTML = svg.join('');
@@ -338,7 +343,9 @@
 
     function pieceCoordinates(seat, pieceIndex, progress) {
         if (progress < 0) return baseCells[seat][pieceIndex];
-        if (progress <= 51) return track[(startOffsets[seat] + progress) % track.length];
-        return homeLanes[seat][Math.min(progress - 52, 5)];
+        const cell = progress <= 51
+            ? track[(startOffsets[seat] + progress) % track.length]
+            : homeLanes[seat][Math.min(progress - 52, 5)];
+        return [cell[0] + 0.5, cell[1] + 0.5];
     }
 })();

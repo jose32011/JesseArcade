@@ -4,6 +4,8 @@
     const yugiohSetup = document.getElementById('loginScreen');
     const yugiohGame = document.getElementById('gameScreen');
     const ludoScreen = document.getElementById('ludoScreen');
+    const snakesLaddersScreen = document.getElementById('snakesLaddersScreen');
+    const unoScreen = document.getElementById('unoScreen');
     const screen = document.getElementById('chessScreen');
     const setup = document.getElementById('chessSetup');
     const game = document.getElementById('chessGame');
@@ -124,6 +126,8 @@
         yugiohSetup.style.display = 'none';
         yugiohGame.style.display = 'none';
         ludoScreen.style.display = 'none';
+        snakesLaddersScreen.style.display = 'none';
+        unoScreen.style.display = 'none';
     }
 
     function restoreSession() {

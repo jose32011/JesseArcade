@@ -61,14 +61,31 @@ document.querySelectorAll('.game-menu-card').forEach(card => {
     card.addEventListener('click', () => {
         if (card.dataset.game === 'ludo') {
             localStorage.setItem('arcade-active-game', 'ludo');
+            window.leaveSnakesLaddersSession?.('ludo');
             window.leaveChessScreen?.('ludo');
             window.showLudoScreen();
             return;
         }
         if (card.dataset.game === 'chess') {
             localStorage.setItem('arcade-active-game', 'chess');
+            window.leaveSnakesLaddersSession?.('chess');
             window.leaveLudoSession?.('chess');
             window.showChessScreen();
+            return;
+        }
+        if (card.dataset.game === 'snakes-ladders') {
+            localStorage.setItem('arcade-active-game', 'snakes-ladders');
+            window.leaveLudoSession?.('snakes-ladders');
+            window.leaveChessScreen?.('snakes-ladders');
+            window.showSnakesLaddersScreen();
+            return;
+        }
+        if (card.dataset.game === 'uno') {
+            localStorage.setItem('arcade-active-game', 'uno');
+            window.leaveLudoSession?.('uno');
+            window.leaveChessScreen?.('uno');
+            window.leaveSnakesLaddersSession?.('uno');
+            window.showUnoScreen();
             return;
         }
         if (card.dataset.game !== 'yugioh') {
@@ -78,6 +95,8 @@ document.querySelectorAll('.game-menu-card').forEach(card => {
         localStorage.setItem('arcade-active-game', 'yugioh');
         window.leaveLudoSession?.('yugioh');
         window.leaveChessScreen?.('yugioh');
+        window.leaveSnakesLaddersSession?.('yugioh');
+        window.leaveUnoSession?.('yugioh');
         gameMenu.style.display = 'none';
         loginScreen.style.display = 'flex';
         gameMenuStatus.textContent = '';

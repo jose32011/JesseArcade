@@ -5,6 +5,8 @@ const path = require('path');
 const cardApi = require('./cardApi');
 const { registerLudoHandlers } = require('./ludo');
 const { registerChessHandlers } = require('./chess');
+const { registerSnakesLaddersHandlers } = require('./snakesLadders');
+const { registerUnoHandlers } = require('./uno');
 
 const app = express();
 const server = http.createServer(app);
@@ -986,6 +988,8 @@ io.on('connection', (socket) => {
 
 registerLudoHandlers(io);
 registerChessHandlers(io);
+registerSnakesLaddersHandlers(io);
+registerUnoHandlers(io);
 
 if (require.main === module) {
   server.listen(PORT, () => {
