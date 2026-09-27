@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test ludo.test.js chess.test.js server.test.js"
+    "test": "node --test ludo.test.js chess.test.js server.test.js cardApi.test.js"
   },
   "keywords": [],
   "author": "",

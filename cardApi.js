@@ -49,6 +49,11 @@ const DECK_PRESETS = {
 const GENERIC_FUSION_CARDS = ['Mudragon of the Swamp', 'Starving Venom Fusion Dragon'];
 const SUPPORTED_SPELLS = ['Dark Hole', 'Monster Reborn', 'Mystical Space Typhoon', 'Polymerization'];
 const SUPPORTED_TRAPS = ['Mirror Force', 'Trap Hole'];
+const MAIN_DECK_COMPOSITION = {
+  monster: 26,
+  spell: 8,
+  trap: 6
+};
 
 class CardApiService {
   constructor() {
@@ -259,27 +264,27 @@ class CardApiService {
       );
       addCard(material);
     });
-    fill(monsterPool, 20, 'monster');
+    fill(monsterPool, MAIN_DECK_COMPOSITION.monster, 'monster');
     fill(allCards.filter(card =>
       isNormalSummonable(card) &&
       !monsterPool.some(themeCard => themeCard.id === card.id)
-    ), 20, 'monster');
+    ), MAIN_DECK_COMPOSITION.monster, 'monster');
 
     const spellPool = archetypeCards.filter(card => card.type.includes('Spell'));
     SUPPORTED_SPELLS.forEach(name => addCard(cardByName(name)));
-    fill(spellPool, 10, 'spell');
+    fill(spellPool, MAIN_DECK_COMPOSITION.spell, 'spell');
     fill(allCards.filter(card =>
       card.type.includes('Spell') &&
       !spellPool.some(themeCard => themeCard.id === card.id)
-    ), 10, 'spell');
+    ), MAIN_DECK_COMPOSITION.spell, 'spell');
 
     const trapPool = archetypeCards.filter(card => card.type.includes('Trap'));
     SUPPORTED_TRAPS.forEach(name => addCard(cardByName(name)));
-    fill(trapPool, 10, 'trap');
+    fill(trapPool, MAIN_DECK_COMPOSITION.trap, 'trap');
     fill(allCards.filter(card =>
       card.type.includes('Trap') &&
       !trapPool.some(themeCard => themeCard.id === card.id)
-    ), 10, 'trap');
+    ), MAIN_DECK_COMPOSITION.trap, 'trap');
 
     if (mainDeck.length !== 40) {
       throw new Error(`Unable to build a legal 40-card ${preset.label} deck.`);
