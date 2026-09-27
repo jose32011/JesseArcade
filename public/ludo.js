@@ -14,10 +14,9 @@
     const rollButton = document.getElementById('ludoRollBtn');
     const resignButton = document.getElementById('ludoResignBtn');
     const movePrompt = document.getElementById('ludoMovePrompt');
-    const moveChoices = document.getElementById('ludoMoveChoices');
     const board = document.getElementById('ludoBoard');
     const die = document.getElementById('ludoDie');
-    const dieCube = document.getElementById('ludoDieCube');
+    const dieFace = document.getElementById('ludoDieFace');
     const tokenKey = 'ludo-player-token';
     const sessionKey = 'ludo-player-session';
     const colors = ['yellow', 'green', 'red', 'blue'];
@@ -88,6 +87,7 @@
         setup.style.display = 'block';
         ludoScreen.style.display = 'none';
         gameMenu.style.display = 'flex';
+        setupStatus.textContent = '';
     });
 
     window.leaveLudoSession = (nextGame = 'menu') => {
@@ -210,8 +210,8 @@
             state.currentPlayerName || (state.waiting ? 'Waiting' : '—');
         setDieFace(state.lastRoll);
         rollButton.disabled = !state.canRoll;
-        resignButton.hidden = !state.started || state.gameOver;
-        resignButton.disabled = state.gameOver;
+        resignButton.hidden = false;
+        resignButton.disabled = !state.started || state.gameOver;
         rollButton.textContent = state.canRoll ? 'Roll die' : 'Roll die';
         movePrompt.textContent = state.waiting
             ? state.mode === 'online'
@@ -221,29 +221,19 @@
                     : 'Preparing your game...'
             : state.yourTurn
                 ? state.diceValue
-                    ? `You rolled ${state.diceValue}. Choose a highlighted piece.`
+                    ? `You rolled ${state.diceValue}. Choose a highlighted piece on the board to move.`
                     : 'Your turn. Roll the die.'
                 : `${state.currentPlayerName || 'Opponent'} is playing.`;
 
         renderPlayers(state);
         renderBoard(state);
-        renderMoveChoices(state);
     }
 
     function setDieFace(value) {
         die.setAttribute('aria-label', value ? `Last die roll: ${value}` : 'No die roll yet');
+        dieFace.dataset.value = String(value || 0);
         if (!value) return;
 
-        const rotations = {
-            1: 'rotateX(-18deg) rotateY(25deg)',
-            2: 'rotateX(-108deg) rotateY(25deg)',
-            3: 'rotateX(-18deg) rotateY(-65deg)',
-            4: 'rotateX(-18deg) rotateY(115deg)',
-            5: 'rotateX(72deg) rotateY(25deg)',
-            6: 'rotateX(-18deg) rotateY(205deg)'
-        };
-        dieCube.style.setProperty('--dice-rotation', rotations[value]);
-        dieCube.dataset.value = String(value);
         if (value !== previousRoll) {
             die.classList.remove('is-rolling');
             void die.offsetWidth;
@@ -268,20 +258,6 @@
                 : player.connected ? 'Online' : 'Reconnecting';
             card.append(name, meta);
             container.append(card);
-        });
-    }
-
-    function renderMoveChoices(state) {
-        moveChoices.replaceChildren();
-        if (!state.yourTurn || !state.legalMoves.length) return;
-        state.legalMoves.forEach(pieceIndex => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.textContent = `Move piece ${pieceIndex + 1}`;
-            button.addEventListener('click', () => {
-                socket.emit('ludoMove', { roomId: currentRoom, pieceIndex });
-            });
-            moveChoices.append(button);
         });
     }
 
@@ -349,7 +325,7 @@
                 state.legalMoves.includes(piece.pieceIndex);
             const color = piece.player.color;
             svg.push(`<g class="ludo-piece${legal ? ' is-legal' : ''}" data-piece-seat="${piece.player.seat}" data-piece-index="${piece.pieceIndex}" tabindex="${legal ? '0' : '-1'}" role="button" aria-label="Move ${color} piece ${piece.pieceIndex + 1}" transform="translate(${piece.x + dx} ${piece.y + dy})">`);
-            svg.push('<circle class="ludo-piece-hit-area" r=".75" fill="transparent" pointer-events="all"/>');
+            svg.push('<circle class="ludo-piece-hit-area" r=".4" fill="transparent" pointer-events="all"/>');
             svg.push(`<ellipse class="ludo-piece-shadow" cx="0" cy=".28" rx=".34" ry=".13"/>`);
             svg.push(`<ellipse cx="0" cy=".16" rx=".33" ry=".15" fill="url(#base-${color})" stroke="#fff" stroke-width=".055"/>`);
             svg.push(`<path d="M-.24 .16 C-.23 .02-.14-.06-.12-.17 A.22.22 0 1 1 .12-.17 C.14-.06.23.02.24.16 Q0 .27-.24.16Z" fill="url(#pawn-${color})" stroke="#fff" stroke-width=".055"/>`);

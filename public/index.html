@@ -85,6 +85,7 @@
             <button id="nextPhaseBtn">Next Phase</button>
             <button id="readyBtn">Ready Up</button>
             <button id="resignDuelBtn" class="resign-button" type="button" style="display: none;">Resign</button>
+            <button id="duelBackToMenuBtn" class="back-to-menu" type="button">← All games</button>
         </div>
         <div id="actionStatus" role="status" aria-live="polite"></div>
         <button id="cancelActionBtn" type="button" style="display: none;">Cancel action</button>
@@ -188,7 +189,7 @@
 
         <section id="ludoGame" class="ludo-panel" style="display: none;">
             <div class="ludo-game-header">
-                <button id="ludoLeaveBtn" class="back-to-menu" type="button">← Leave game</button>
+                <button id="ludoLeaveBtn" class="back-to-menu" type="button">← All games</button>
                 <div>
                     <p class="eyebrow">LUDO ROOM <span id="ludoCurrentRoom"></span></p>
                     <h1 id="ludoStatus" role="status" aria-live="polite">Waiting for players...</h1>
@@ -200,19 +201,13 @@
                 <div id="ludoBoard" class="ludo-board-wrap" aria-label="Ludo board"></div>
                 <aside class="ludo-controls">
                     <div id="ludoDie" class="ludo-die" role="img" aria-label="No die roll yet">
-                        <div id="ludoDieCube" class="ludo-die-cube">
-                            <div class="ludo-die-face die-face-front"><i></i></div>
-                            <div class="ludo-die-face die-face-back"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-                            <div class="ludo-die-face die-face-right"><i></i><i></i><i></i></div>
-                            <div class="ludo-die-face die-face-left"><i></i><i></i><i></i><i></i></div>
-                            <div class="ludo-die-face die-face-top"><i></i><i></i><i></i><i></i><i></i></div>
-                            <div class="ludo-die-face die-face-bottom"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                        <div id="ludoDieFace" class="ludo-die-face-2d" data-value="0" aria-hidden="true">
+                            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
                         </div>
                     </div>
                     <button id="ludoRollBtn" type="button" disabled>Roll die</button>
-                    <button id="ludoResignBtn" class="resign-button" type="button" hidden>Resign</button>
+                    <button id="ludoResignBtn" class="resign-button" type="button" disabled>Resign</button>
                     <p id="ludoMovePrompt" role="status" aria-live="polite">Join a room to play.</p>
-                    <div id="ludoMoveChoices" class="ludo-move-choices"></div>
                     <p class="ludo-rules-hint">Roll a 6 to leave your base. Land on an opponent to send them home. Reach the center with an exact roll.</p>
                 </aside>
             </div>
@@ -264,7 +259,7 @@
                         </select>
                         <button id="chessPromotionConfirm" type="button">Promote</button>
                     </div>
-                    <button id="chessResignBtn" class="resign-button" type="button" hidden>Resign</button>
+                    <button id="chessResignBtn" class="resign-button" type="button" disabled>Resign</button>
                     <h2>Moves</h2>
                     <ol id="chessMoveHistory" class="chess-move-history"></ol>
                     <p class="chess-rules-hint">Standard chess rules apply, including castling, en passant, check, checkmate, stalemate, and promotion.</p>

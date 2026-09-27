@@ -65,7 +65,8 @@
         localStorage.setItem('arcade-active-game', 'chess');
         hideOtherGames();
         screen.style.display = 'block';
-        setup.style.display = 'block';
+        setup.style.display = 'flex';
+        game.style.display = 'none';
     };
 
     window.leaveChessScreen = (nextGame = 'menu') => {
@@ -78,6 +79,8 @@
     document.getElementById('chessBackToMenu').addEventListener('click', () => {
         window.leaveChessScreen('menu');
         screen.style.display = 'none';
+        setup.style.display = 'flex';
+        game.style.display = 'none';
         menu.style.display = 'flex';
         setupStatus.textContent = '';
     });
@@ -86,7 +89,7 @@
         window.leaveChessScreen('menu');
         screen.style.display = 'none';
         game.style.display = 'none';
-        setup.style.display = 'block';
+        setup.style.display = 'flex';
         menu.style.display = 'flex';
     });
 
@@ -247,8 +250,8 @@
                     ? 'Your move'
                     : `${state.turn === 'w' ? 'White' : 'Black'} to move`
             : 'Waiting for the other player to join';
-        resignButton.hidden = !state.started || state.gameOver;
-        resignButton.disabled = state.gameOver;
+        resignButton.hidden = false;
+        resignButton.disabled = !state.started || state.gameOver;
         renderPlayers(state);
         renderBoard(state);
         renderHistory(state.history || []);

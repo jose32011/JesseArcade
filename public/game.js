@@ -41,6 +41,7 @@ const deckTypeInput = document.getElementById('deckType');
 const joinBtn = document.getElementById('joinBtn');
 const readyBtn = document.getElementById('readyBtn');
 const resignDuelBtn = document.getElementById('resignDuelBtn');
+const duelBackToMenuBtn = document.getElementById('duelBackToMenuBtn');
 const extraDeckBtn = document.getElementById('extraDeckBtn');
 const nextPhaseBtn = document.getElementById('nextPhaseBtn');
 const directAttackBtn = document.getElementById('directAttackBtn');
@@ -83,11 +84,8 @@ document.querySelectorAll('.game-menu-card').forEach(card => {
     });
 });
 
-document.getElementById('backToGameMenuBtn').addEventListener('click', () => {
-    localStorage.setItem('arcade-active-game', 'menu');
-    loginScreen.style.display = 'none';
-    gameMenu.style.display = 'flex';
-});
+document.getElementById('backToGameMenuBtn').addEventListener('click', returnToGameMenu);
+duelBackToMenuBtn.addEventListener('click', returnToGameMenu);
 
 joinBtn.addEventListener('click', joinGame);
 joinBtn.addEventListener('touchend', (e) => {
@@ -97,8 +95,8 @@ joinBtn.addEventListener('touchend', (e) => {
 
 readyBtn.addEventListener('click', toggleReady);
 resignDuelBtn.addEventListener('click', () => {
-    if (!gameState?.gameStarted || gameState.gameOver ||
-        !window.confirm('Resign this duel? Your opponent will win.')) return;
+    if (!gameState || !gameState.gameStarted || gameState.gameOver) return;
+    if (!window.confirm('Resign this duel? Your opponent will win.')) return;
     resignDuelBtn.disabled = true;
     socket.emit('resignGame', { roomId: currentRoom });
 });
@@ -143,6 +141,19 @@ function joinGame() {
     localStorage.setItem('arcade-active-game', 'yugioh');
     saveDuelSession();
     sendJoinRequest();
+}
+
+function returnToGameMenu() {
+    if (currentRoom) socket.emit('leaveGame', { roomId: currentRoom });
+    sessionStorage.removeItem(tabDuelSessionStorageKey);
+    currentRoom = '';
+    gameState = null;
+    gameOverShown = false;
+    document.querySelector('.game-over')?.remove();
+    loginScreen.style.display = 'none';
+    gameScreen.style.display = 'none';
+    gameMenu.style.display = 'flex';
+    localStorage.setItem('arcade-active-game', 'menu');
 }
 
 function saveDuelSession() {
@@ -514,9 +525,8 @@ function updateUI() {
     const opponentDeckLabel = gameState.opponent.deckType || 'Deck';
     const lobbyStatus = document.getElementById('lobbyStatus');
     readyBtn.style.display = gameState.gameStarted ? 'none' : 'inline-block';
-    resignDuelBtn.style.display =
-        gameState.gameStarted && !gameState.gameOver ? 'inline-block' : 'none';
-    resignDuelBtn.disabled = gameState.starting || gameState.gameOver;
+    resignDuelBtn.style.display = 'inline-block';
+    resignDuelBtn.disabled = !gameState.gameStarted || gameState.starting || gameState.gameOver;
     readyBtn.disabled = gameState.starting;
     readyBtn.textContent = gameState.starting
         ? 'Preparing decks...'
@@ -1263,18 +1273,54 @@ function checkGameOver() {
 }
 
 function showGameOver(won, resultReason) {
+    document.querySelector('.game-over')?.remove();
     const gameOverDiv = document.createElement('div');
     gameOverDiv.className = 'game-over';
     const result = resultReason === 'resignation' ? 'A player resigned.'
         : resultReason === 'deck-out' ? 'The active player could not draw from an empty deck.'
         : resultReason === 'life-points' ? 'A player reached 0 Life Points.'
             : 'The Duel has ended.';
-    gameOverDiv.innerHTML = `
-        <h2>${gameState.winner === null ? 'Duel Over' : won ? 'You Win!' : 'You Lose!'}</h2>
-        <p>${result}</p>
-        <button onclick="location.reload()">Play Again</button>
-    `;
+    const heading = document.createElement('h2');
+    heading.textContent = gameState.winner === null
+        ? 'Duel Over'
+        : won ? 'You Win!' : 'You Lose!';
+    const description = document.createElement('p');
+    description.textContent = result;
+    const setupButton = document.createElement('button');
+    setupButton.type = 'button';
+    setupButton.textContent = 'Set Up Another Duel';
+    setupButton.addEventListener('click', startAnotherDuel);
+    const menuButton = document.createElement('button');
+    menuButton.type = 'button';
+    menuButton.textContent = '← All games';
+    menuButton.addEventListener('click', returnToGameMenu);
+    gameOverDiv.append(heading, description, setupButton, menuButton);
     document.body.appendChild(gameOverDiv);
+}
+
+function startAnotherDuel() {
+    sessionStorage.removeItem(tabDuelSessionStorageKey);
+    currentRoom = '';
+    gameState = null;
+    gameOverShown = false;
+    document.querySelector('.game-over')?.remove();
+    document.querySelectorAll('.zone').forEach(zone => {
+        zone.replaceChildren();
+    });
+    document.getElementById('handCards').replaceChildren();
+    playerName = playerNameInput.value.trim();
+    roomIdInput.value = `duel-${createRoomSuffix()}`;
+    localStorage.setItem('arcade-active-game', 'yugioh');
+    gameScreen.style.display = 'none';
+    gameMenu.style.display = 'none';
+    loginScreen.style.display = 'flex';
+    setActionStatus('');
+}
+
+function createRoomSuffix() {
+    if (window.crypto.randomUUID) return window.crypto.randomUUID().slice(0, 8);
+    const bytes = window.crypto.getRandomValues(new Uint8Array(4));
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
 function resetGame() {

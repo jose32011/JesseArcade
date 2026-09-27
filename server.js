@@ -825,6 +825,24 @@ io.on('connection', (socket) => {
     broadcastGameState(game);
   });
 
+  socket.on('leaveGame', ({ roomId } = {}) => {
+    const game = games[roomId];
+    const playerToken = socket.data.playerToken;
+    const player = game?.players[playerToken];
+    if (!game || !isCurrentPlayerSocket(game, socket, roomId) || !player) return;
+
+    player.socket = null;
+    socket.leave(roomId);
+    delete socket.data.roomId;
+    delete socket.data.playerToken;
+    Object.values(game.players).forEach(otherPlayer => {
+      if (otherPlayer.socket?.connected) {
+        otherPlayer.socket.emit('playerDisconnected', player.name);
+      }
+    });
+    broadcastGameState(game);
+  });
+
   socket.on('nextPhase', ({ roomId }) => {
     const game = games[roomId];
     const playerToken = socket.data.playerToken;
